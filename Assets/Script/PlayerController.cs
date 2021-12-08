@@ -1,20 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    public Input input;
     public Joystick joystick;
+
+    [Header("Car Configuration")]
     public float rotationSpeed;
     public float movementSpeed;
 
     void Update()
     {
-        if(!Touchscreen.current.primaryTouch.press.isPressed) return;
+        if(!input.Detected()) return;
 
-        Steer();
-        Move();
+        if(input.InJoystickArea()) {
+            Steer();
+            Move();
+        }
     }
 
     private void Steer()
@@ -28,7 +32,7 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float speed = movementSpeed * Time.deltaTime;
-
+        
         transform.Translate(0, speed, 0);
     }
 }
