@@ -11,7 +11,7 @@ TagManager:
   - Obstacle
   - Water
   - UI
-  - 
+  - Despawn Area
   - 
   - 
   - 
@@ -40,4 +40,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Obstacle
+    uniqueID: 2538891957
+    locked: 0
+  - name: UI
+    uniqueID: 551206775
     locked: 0

@@ -5,9 +5,14 @@ using UnityEngine;
 public class ObstacleManager : MonoBehaviour
 {
     public Edge cameraEdge;
+    
+    [Header("Spawn Setting")]
     public float spacing;
-    public float coverageDistance = 1;
     public int neighborhood, obstacleLimit;
+    public GameObject spawnArea;
+    public GameObject despawnArea;
+
+    [Header("Obstacles")]
     public List<GameObject> obstacleList = new List<GameObject>();
     public List<GameObject> activeObstacle = new List<GameObject>();
 
@@ -47,12 +52,15 @@ public class ObstacleManager : MonoBehaviour
         }
 
         if(location == "outside") {
-            // FIXME: spawnloc should be in front of car
+            float yt = spawnArea.transform.position.y + spawnArea.transform.localScale.y;
+            float xr = spawnArea.transform.position.x + spawnArea.transform.localScale.x;
+            float xl = spawnArea.transform.position.x - spawnArea.transform.localScale.x;
+            float yb = spawnArea.transform.position.y - spawnArea.transform.localScale.y;
 
-            spawnPointX = Random.Range(cameraEdge.world[3] * coverageDistance, cameraEdge.world[1] * coverageDistance);
-            spawnPointY = Random.Range(cameraEdge.world[2] * coverageDistance, cameraEdge.world[0] * coverageDistance);
+            spawnPointX = Random.Range(xl, xr);
+            spawnPointY = Random.Range(yt, yb);
             loc.Set(spawnPointX, spawnPointY, 0);
-            
+
             if(!InsideCamera(loc))
                 return null;
         }
@@ -104,10 +112,29 @@ public class ObstacleManager : MonoBehaviour
 
     private void Despawn()
     {
-        // FIXME: despawn obstacle behind car
-        if(activeObstacle.Count < obstacleLimit) return;
+        if(activeObstacle.Count < obstacleLimit)
+            return;
 
-        for(int i = 0; i < 5; i++) {
+        bool InDespawnArea(GameObject obstacle) {
+            Vector3 obstaclePosition = obstacle.transform.position;
+            float yt = despawnArea.transform.position.y + despawnArea.transform.localScale.y;
+            float xr = despawnArea.transform.position.x + despawnArea.transform.localScale.x;
+            float xl = despawnArea.transform.position.x - despawnArea.transform.localScale.x;
+            float yb = despawnArea.transform.position.y - despawnArea.transform.localScale.y;
+
+            if((obstaclePosition.x >= xl) && (obstaclePosition.x <= xr))
+                if((obstaclePosition.y >= yb) && (obstaclePosition.y <= yt))
+                    return true;
+                else
+                    return false;
+            else
+                return false;
+        }
+
+        for(int i = 0; i < activeObstacle.Count - 1; i++) {
+            if(!InDespawnArea(activeObstacle[i]))
+                continue;
+            
             Destroy(activeObstacle[i]);
             activeObstacle.RemoveAt(i);
         }
